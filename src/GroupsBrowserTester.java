@@ -107,48 +107,54 @@ public class GroupsBrowserTester {
     }
 
     private static void emailIfFailures(String testResults) {
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.ox.ac.uk");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "587");
-
-        Session session = Session.getDefaultInstance(props,
-                new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("ouit0196","1234Names2");
-                    }
-                });
 
         String failedChecks = "";
         String[] split = testResults.split(";");
-        if (split[1].trim().equals("no")){
-            failedChecks = failedChecks + "1) ";
-        }
-        if (split[2].trim().equals("no")){
-            failedChecks = failedChecks + "2) ";
-        }
-        if (split[3].trim().equals("no")){
-            failedChecks = failedChecks + "3) ";
-        }
 
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("admin@sole.oucs.ox.ac.uk"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("nick.wilson@it.ox.ac.uk"));
-            message.setSubject("** WebLearn Groups Browser Alert ** ");
-            message.setText("Dear WebLearner," +
-                    "\n\nYou have received this email alert because one (or more) of the following 3 checks on WebLearn's course and unit groups tree browser has failed:" +
-                    "\n\n1)   Log into WebLearn, navigate to Site Info in the 'Course-Groups-Heroku-Test' site, click the 'Add Participants' button and check if the Course and Unit " +
-                    "Groups tree browsers (top nodes) appear within 10 seconds." +
-                    "\n\n2)   Click on the top node of the Courses tree and check if 'Ancient History & Classical Archaeology' appears within 10 seconds." +
-                    "\n\n3)   Click on the top node of the Units tree and check if 'ASUC' appears within 10 seconds." +
-                    "\n\n** FAILED CHECKS **: " + failedChecks + "" +
-                    "\n\nAdmin (sole.oucs.ox.ac.uk)" +
-                    "\n(if you have any queries, please email or contact Nick Wilson (nick.wilson@it.ox.ac.uk) (13716) who generated this alert)");
+        if (split[1].trim().equals("no") || split[2].trim().equals("no") || split[3].trim().equals("no")){
 
-            Transport.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            if (split[1].trim().equals("no")){
+                failedChecks = failedChecks + "1) ";
+            }
+            if (split[2].trim().equals("no")){
+                failedChecks = failedChecks + "2) ";
+            }
+            if (split[3].trim().equals("no")){
+                failedChecks = failedChecks + "3) ";
+            }
+
+
+            Properties props = new Properties();
+            props.put("mail.smtp.host", "smtp.ox.ac.uk");
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.port", "587");
+
+            Session session = Session.getDefaultInstance(props,
+                    new Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication("ouit0196","1234Names2");
+                        }
+                    });
+
+            try {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress("admin@sole.oucs.ox.ac.uk"));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("nick.wilson@it.ox.ac.uk"));
+                message.setSubject("** WebLearn Groups Browser Alert ** ");
+                message.setText("Dear WebLearner," +
+                        "\n\nYou have received this email alert because one (or more) of the following 3 checks on WebLearn's course and unit groups tree browser has failed:" +
+                        "\n\n1)   Log into WebLearn, navigate to Site Info in the 'Course-Groups-Heroku-Test' site, click the 'Add Participants' button and check if the Course and Unit " +
+                        "Groups tree browsers (top nodes) appear within 10 seconds." +
+                        "\n\n2)   Click on the top node of the Courses tree and check if 'Ancient History & Classical Archaeology' appears within 10 seconds." +
+                        "\n\n3)   Click on the top node of the Units tree and check if 'ASUC' appears within 10 seconds." +
+                        "\n\n** FAILED CHECKS **: " + failedChecks + "" +
+                        "\n\nAdmin (sole.oucs.ox.ac.uk)" +
+                        "\n(if you have any queries, please email or contact Nick Wilson (nick.wilson@it.ox.ac.uk) (13716) who generated this alert)");
+
+                Transport.send(message);
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
