@@ -32,11 +32,11 @@ public class GroupsBrowserTester {
             Calendar cal = Calendar.getInstance();
             String date = new SimpleDateFormat("MMM_YYYY").format(cal.getTime());
 
-            File file = new File("groups_browser_checker_results_" + date + ".csv");
+            File file = new File("//home//ouit0196//groups_browser_test//groups_browser_checker_results_" + date + ".csv");
             if(!file.exists()){
                 file.createNewFile();
             }
-            FileWriter fileWriter = new FileWriter(file.getName(),true);
+            FileWriter fileWriter = new FileWriter(file.getAbsoluteFile(), true);
             BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
             bufferWriter.newLine();
             bufferWriter.write(testResults);
@@ -70,7 +70,7 @@ public class GroupsBrowserTester {
 
         // check top nodes appear
         try {
-            WebElement courses = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses1")));
+            WebElement courses = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses")));
             WebElement units = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units")));
             testResults = testResults  + "yes;";
         }
@@ -82,7 +82,7 @@ public class GroupsBrowserTester {
         try {
             WebElement courseLink = driver.findElement(By.id("courses"));
             courseLink.click();
-            (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses:5E05YA1")));
+            (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses:5E05YA")));
             testResults = testResults  + "yes;";
         }
         catch (Exception e){
@@ -93,7 +93,7 @@ public class GroupsBrowserTester {
         try {
             WebElement courseLink = driver.findElement(By.id("units"));
             courseLink.click();
-            (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units:acserv1")));
+            (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units:acserv")));
             testResults = testResults  + "yes;";
         }
         catch (Exception e){
