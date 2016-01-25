@@ -1,4 +1,5 @@
 # wl-groups-browser-test
+
 This process sits on sole.oucs.ox.ac.uk and logs into WebLearn and writes a line to a csv of whether the course and units groups browser are working properly.
 
 This program logs into WebLearn, goes to Site Info in the Course-Groups-Heroku-Test site, clicks the 'Add Participants' button and makes various check on the groups browser tree,
@@ -14,7 +15,7 @@ Groups tree browsers (top nodes) appear within 10 seconds?
 
 To develop and test any changes, you can run the java main class from the IDE.
 
-To deploy it to sole, find the .class file and run:
+To deploy it to sole, cd to the .class file and run:
 
 jar cfm GroupsBrowserTester.jar ../manifest/Manifest.MF GroupsBrowserTester*.class
 

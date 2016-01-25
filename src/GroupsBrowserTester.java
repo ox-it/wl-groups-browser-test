@@ -22,34 +22,33 @@ import java.util.Properties;
 public class GroupsBrowserTester {
 
     public static void main(String[] args) {
-        String toWrite = checkGroupsBrowsers();
-        log(toWrite);
-        email(toWrite);
+        String testResults = checkGroupsBrowsers();
+        log(testResults);
+        emailIfFailures(testResults);
     }
 
-    private static void log(String toWrite) {
+    private static void log(String testResults) {
         try{
             Calendar cal = Calendar.getInstance();
             String date = new SimpleDateFormat("MMM_YYYY").format(cal.getTime());
 
-
             File file = new File("groups_browser_checker_results_" + date + ".csv");
-
             if(!file.exists()){
                 file.createNewFile();
             }
-
-            FileWriter fileWritter = new FileWriter(file.getName(),true);
-            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-            bufferWritter.newLine();
-            bufferWritter.write(toWrite);
-            bufferWritter.close();
+            FileWriter fileWriter = new FileWriter(file.getName(),true);
+            BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
+            bufferWriter.newLine();
+            bufferWriter.write(testResults);
+            bufferWriter.close();
         } catch(IOException e){
             e.printStackTrace();
         }
     }
 
     private static String checkGroupsBrowsers() {
+
+        // initialise new JS-enabled webdriver
         HtmlUnitDriver driver = new HtmlUnitDriver();
         driver.setJavascriptEnabled(true);
 
@@ -67,43 +66,47 @@ public class GroupsBrowserTester {
         WebElement button = driver.findElement(By.name("eventSubmit_doExternalGroupsHelper"));
         button.click();
 
-        String toWrite = "" + new Date()  + ";";
+        String testResults = "" + new Date()  + ";";
+
+        // check top nodes appear
         try {
             WebElement courses = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses1")));
             WebElement units = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units")));
-            toWrite = toWrite  + "yes;";
+            testResults = testResults  + "yes;";
         }
         catch (Exception e){
-            toWrite = toWrite  + "no;";
+            testResults = testResults  + "no;";
         }
 
+        // check course groups brwoser opens
         try {
             WebElement courseLink = driver.findElement(By.id("courses"));
             courseLink.click();
             (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses:5E05YA1")));
-            toWrite = toWrite  + "yes;";
+            testResults = testResults  + "yes;";
         }
         catch (Exception e){
-            toWrite = toWrite  + "no;";
+            testResults = testResults  + "no;";
         }
 
+        // check units groups browser opens
         try {
             WebElement courseLink = driver.findElement(By.id("units"));
             courseLink.click();
             (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units:acserv1")));
-            toWrite = toWrite  + "yes;";
+            testResults = testResults  + "yes;";
         }
         catch (Exception e){
-            toWrite = toWrite  + "no;";
+            testResults = testResults  + "no;";
         }
 
-        System.out.println("Page title is: " + driver.getTitle());
+        driver.getTitle();
         driver.quit();
 
-        return toWrite;
+        return testResults;
     }
 
-    private static void email(String toWrite) {
+    private static void emailIfFailures(String testResults) {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.ox.ac.uk");
         props.put("mail.smtp.auth", "true");
@@ -112,13 +115,12 @@ public class GroupsBrowserTester {
         Session session = Session.getDefaultInstance(props,
                 new Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        //You need to put your user name and password here
                         return new PasswordAuthentication("ouit0196","1234Names2");
                     }
                 });
 
         String failedChecks = "";
-        String[] split = toWrite.split(";");
+        String[] split = testResults.split(";");
         if (split[1].trim().equals("no")){
             failedChecks = failedChecks + "1) ";
         }
