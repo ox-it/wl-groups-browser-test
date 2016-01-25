@@ -1,5 +1,4 @@
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -8,6 +7,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -16,85 +22,129 @@ import java.util.Properties;
 public class GroupsBrowserTester {
 
     public static void main(String[] args) {
+        String toWrite = checkGroupsBrowsers();
+        log(toWrite);
+        email(toWrite);
+    }
+
+    private static void log(String toWrite) {
+        try{
+            Calendar cal = Calendar.getInstance();
+            String date = new SimpleDateFormat("MMM_YYYY").format(cal.getTime());
 
 
+            File file = new File("groups_browser_checker_results_" + date + ".csv");
+
+            if(!file.exists()){
+                file.createNewFile();
+            }
+
+            FileWriter fileWritter = new FileWriter(file.getName(),true);
+            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+            bufferWritter.newLine();
+            bufferWritter.write(toWrite);
+            bufferWritter.close();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private static String checkGroupsBrowsers() {
         HtmlUnitDriver driver = new HtmlUnitDriver();
         driver.setJavascriptEnabled(true);
 
-        // And now use this to visit Google
+        // login
         driver.get("https://weblearn.ox.ac.uk/portal/xlogin?returnPath=%2F");
-
-        // Find the text input element by its name
         WebElement element = driver.findElement(By.name("eid"));
-
-        // Enter something to search for
         element.sendKeys("dashing");
-
-        // Find the text input element by its name
         element = driver.findElement(By.name("pw"));
-
-        // Enter something to search for
         element.sendKeys("dashDASH123");
-
-        // Now submit the form. WebDriver will find the form for us from the element
         element.submit();
 
-        // Check the title of the page
-
+        // check tree browsers
         driver.get("https://weblearn.ox.ac.uk/portal/hierarchy/261b9bd5-9a08-4be1-b0de-2bb39d3d7543/page/site_info");
-
-
         driver.switchTo().frame("Mainbb447cc4x7b6cx4bb9xbfcdx60888ca4089b");
-//        WebDriverWait wait = new WebDriverWait(driver, 10); wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("eventSubmit_doExternalGroupsHelper")));
-
         WebElement button = driver.findElement(By.name("eventSubmit_doExternalGroupsHelper"));
         button.click();
 
+        String toWrite = "" + new Date()  + ";";
+        try {
+            WebElement courses = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses1")));
+            WebElement units = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units")));
+            toWrite = toWrite  + "yes;";
+        }
+        catch (Exception e){
+            toWrite = toWrite  + "no;";
+        }
 
-        WebElement courses = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.presenceOfElementLocated(By.id("courses")));
+        try {
+            WebElement courseLink = driver.findElement(By.id("courses"));
+            courseLink.click();
+            (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("courses:5E05YA1")));
+            toWrite = toWrite  + "yes;";
+        }
+        catch (Exception e){
+            toWrite = toWrite  + "no;";
+        }
 
-        WebElement units = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.presenceOfElementLocated(By.id("units")));
+        try {
+            WebElement courseLink = driver.findElement(By.id("units"));
+            courseLink.click();
+            (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id("units:acserv1")));
+            toWrite = toWrite  + "yes;";
+        }
+        catch (Exception e){
+            toWrite = toWrite  + "no;";
+        }
 
         System.out.println("Page title is: " + driver.getTitle());
-
         driver.quit();
 
+        return toWrite;
+    }
 
-
-//        log
-//                email
+    private static void email(String toWrite) {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.ox.ac.uk");
-//        props.put("mail.smtp.socketFactory.port", "587");
-//        props.put("mail.smtp.socketFactory.class",
-//                "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "587");
 
         Session session = Session.getDefaultInstance(props,
-                new javax.mail.Authenticator() {
+                new Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
                         //You need to put your user name and password here
-                        return new PasswordAuthentication("ouy","password");
+                        return new PasswordAuthentication("ouit0196","1234Names2");
                     }
                 });
 
-        try {
+        String failedChecks = "";
+        String[] split = toWrite.split(";");
+        if (split[1].trim().equals("no")){
+            failedChecks = failedChecks + "1) ";
+        }
+        if (split[2].trim().equals("no")){
+            failedChecks = failedChecks + "2) ";
+        }
+        if (split[3].trim().equals("no")){
+            failedChecks = failedChecks + "3) ";
+        }
 
+        try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress("admin@sole.oucs.ox.ac.uk"));
-            message.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse("nick.wilson@it.ox.ac.uk"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("nick.wilson@it.ox.ac.uk"));
             message.setSubject("** WebLearn Groups Browser Alert ** ");
-            message.setText("Welcome to makecodeeasy blog," +
-                    "\n\n Mail from my mail Server!");
+            message.setText("Dear WebLearner," +
+                    "\n\nYou have received this email alert because one (or more) of the following 3 checks on WebLearn's course and unit groups tree browser has failed:" +
+                    "\n\n1)   Log into WebLearn, navigate to Site Info in the 'Course-Groups-Heroku-Test' site, click the 'Add Participants' button and check if the Course and Unit " +
+                    "Groups tree browsers (top nodes) appear within 10 seconds." +
+                    "\n\n2)   Click on the top node of the Courses tree and check if 'Ancient History & Classical Archaeology' appears within 10 seconds." +
+                    "\n\n3)   Click on the top node of the Units tree and check if 'ASUC' appears within 10 seconds." +
+                    "\n\n** FAILED CHECKS **: " + failedChecks + "" +
+                    "\n\nAdmin (sole.oucs.ox.ac.uk)" +
+                    "\n(if you have any queries, please email or contact Nick Wilson (nick.wilson@it.ox.ac.uk) (13716) who generated this alert)");
 
             Transport.send(message);
-
-            System.out.println("Done");
-
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
