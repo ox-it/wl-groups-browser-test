@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -139,7 +140,7 @@ public class GroupsBrowserTester {
             try {
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress("admin@sole.oucs.ox.ac.uk"));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("nick.wilson@it.ox.ac.uk"));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("nick.wilson@it.ox.ac.uk, adam.marshall@it.ox.ac.uk"));
                 message.setSubject("** WebLearn Groups Browser Alert ** ");
                 message.setText("Dear WebLearner," +
                         "\n\nYou have received this email alert because one (or more) of the following 3 checks on WebLearn's course and unit groups tree browser has failed:" +
