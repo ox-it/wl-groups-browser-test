@@ -13,7 +13,6 @@ Groups tree browsers (top nodes) appear within 10 seconds?
 3.   Click on the top node of the Courses tree.  Does 'Ancient History & Classical Archaeology' appears within 10 seconds?
 4.   Click on the top node of the Units tree.  Does 'ASUC' appear within 10 seconds?
 
-
 To develop and test any changes, you can run the java main class from the IDE.
 
 To deploy it to sole, cd to the .class file and run:
