@@ -102,6 +102,12 @@ public class GroupsBrowserTester {
         }
 
         driver.getTitle();
+
+	    driver.switchTo().parentFrame();
+	    WebElement logoutButton = driver.findElement(By.id("loginLink1"));
+	    logoutButton.click();
+
+
         driver.quit();
 
         return testResults;
